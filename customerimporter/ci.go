@@ -16,8 +16,8 @@ import (
 	"strings"
 )
 
-var m map[string]int = make(map[string]int)
-var domains []string
+// var m map[string]int = make(map[string]int)
+// var domains []string
 
 //DomainCount represents a data structure of email domains and its occurreence
 type DomainCount struct {
@@ -25,7 +25,7 @@ type DomainCount struct {
 	Count  int
 }
 
-func processLine(email string) error {
+func processLine(email string, m map[string]int) error {
 
 	domain := strings.Split(email, "@")
 
@@ -83,6 +83,8 @@ func SortDomains(path string) ([]DomainCount, error) {
 		return nil, err
 	}
 
+	var m map[string]int = make(map[string]int)
+
 	csvfile := csv.NewReader(file)
 
 	for {
@@ -107,7 +109,7 @@ func SortDomains(path string) ([]DomainCount, error) {
 			continue
 		}
 
-		err = processLine(row[2])
+		err = processLine(row[2], m)
 
 		if err != nil {
 			return nil, err
