@@ -2,10 +2,11 @@ package customerimporter
 
 import (
 	"log"
+	"strings"
 	"testing"
 )
 
-func TestCSVErrorHandling(t *testing.T) {
+func TestErrorHandling(t *testing.T) {
 	cases := []struct {
 		fileName  string
 		returnErr bool
@@ -36,7 +37,7 @@ func TestCSVErrorHandling(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			log.Println("Executing test:" + tc.name)
-			_, err := SortDomains2(tc.fileName)
+			_, err := SortDomains(tc.fileName)
 			returnedErr := err != nil
 
 			if returnedErr != tc.returnErr {
@@ -46,9 +47,69 @@ func TestCSVErrorHandling(t *testing.T) {
 	}
 }
 
-func BenchmarkSortDomains2(b *testing.B) {
-	var fileName = "csv_tests/valid.csv"
+func TestSort(t *testing.T) {
+	cases := []struct {
+		fileName string
+		name     string
+		want     []DomainCount
+	}{
+
+		{
+			fileName: "csv_tests/valid2.csv",
+			name:     "ValidSort",
+			want: []DomainCount{
+				{
+					Domain: "a.com",
+					Count:  2,
+				},
+				{
+					Domain: "b.com",
+					Count:  1,
+				},
+				{
+					Domain: "c.com",
+					Count:  2,
+				},
+				{
+					Domain: "d.com",
+					Count:  1,
+				},
+				{
+					Domain: "e.com",
+					Count:  3,
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			log.Println("Executing test:" + tc.name)
+			got, _ := SortDomains(tc.fileName)
+
+			for i := 0; i < len(got); i++ {
+				wantedCounter := tc.want[i].Count
+				gotCounted := got[i].Count
+
+				wantedDomain := tc.want[i].Domain
+				gotDomain := got[i].Domain
+				if wantedCounter != gotCounted {
+					t.Fatalf("Expected Count: %v, got: %v", tc.want[i].Count, got[i].Count)
+
+				}
+				if strings.Compare(wantedDomain, gotDomain) != 0 {
+					t.Fatalf("Expected Domain: %v, got: %v", wantedDomain, gotDomain)
+
+				}
+
+			}
+		})
+	}
+}
+
+func BenchmarkSortDomains(b *testing.B) {
+	var fileName = "csv_tests/valid.csv" //TODO: use flag to pass a file path
 	for i := 0; i < b.N; i++ {
-		SortDomains2(fileName)
+		SortDomains(fileName)
 	}
 }

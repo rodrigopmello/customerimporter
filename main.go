@@ -1,21 +1,28 @@
 package main
 
 import (
-	"rankByDomain/customerimporter"
-	"time"
+	"customer_csv/customerimporter"
+	"fmt"
+	"os"
 
 	"github.com/yanzay/log"
 )
 
 func main() {
 
-	t1 := time.Now()
-	domains, err := customerimporter.SortDomains2("customers.csv")
+	if len(os.Args) != 2 {
+		fmt.Println("Incorrect number of arguments. Insert a path to a csv file.")
+		return
+	}
 
+	domains, err := customerimporter.SortDomains(os.Args[1])
 	if err != nil {
 		log.Println(err)
 	}
-	log.Println(domains)
-	log.Println(time.Now().Sub(t1))
+
+	for _, d := range domains {
+		fmt.Printf("Domain: %s, Occurence: %d \n", d.Domain, d.Count)
+
+	}
 
 }
