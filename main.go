@@ -1,7 +1,7 @@
 package main
 
 import (
-	"customer_csv/customerimporter"
+	"customerimporter/customerimporter"
 	"fmt"
 	"os"
 
