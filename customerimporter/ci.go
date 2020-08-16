@@ -10,8 +10,6 @@ import (
 	"encoding/csv"
 	"errors"
 	"io"
-	"log"
-	"os"
 	"sort"
 	"strings"
 )
@@ -64,28 +62,26 @@ func sortKeys(records map[string]int) []DomainCount {
 
 func checkCSV(header []string) (bool, error) {
 	if len(header) != 5 { //check if the csv file contains the required amount of fields
-		return false, errors.New("Invalid csv header")
+
+		return false, csv.ErrFieldCount
 	}
 
-	//todo: implement a more robust validation
-	return strings.Contains(header[0], "first_name"), nil
+	var validHeader bool = strings.Contains(header[0], "first_name") &&
+		strings.Contains(header[1], "last_name") &&
+		strings.Contains(header[2], "email") &&
+		strings.Contains(header[3], "gender") &&
+		strings.Contains(header[4], "ip_address")
+
+	return validHeader, nil
 
 }
 
 //SortDomains returns a sorted []DomainCount and any encountered error.
-func SortDomains(path string) ([]DomainCount, error) {
-	file, err := os.Open(path)
-
-	defer file.Close()
-
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
+func SortDomains(r io.Reader) ([]DomainCount, error) {
 
 	var m map[string]int = make(map[string]int)
 
-	csvfile := csv.NewReader(file)
+	csvfile := csv.NewReader(r)
 
 	for {
 		row, err := csvfile.Read()
@@ -97,7 +93,7 @@ func SortDomains(path string) ([]DomainCount, error) {
 			return nil, err
 
 		}
-		//check if a row contains a header, which occurs every 1k lines. This check it is also used to detect invalid rows
+		//check if a row contains a header, which occurs every 1k lines. This check is also used to detect invalid rows
 		headerRow, err := checkCSV(row)
 
 		if err != nil {

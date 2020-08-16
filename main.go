@@ -1,7 +1,7 @@
 package main
 
 import (
-	"customer_csv/customerimporter"
+	"customerimporter/customerimporter"
 	"fmt"
 	"os"
 
@@ -15,13 +15,23 @@ func main() {
 		return
 	}
 
-	domains, err := customerimporter.SortDomains(os.Args[1])
+	file, err := os.Open(os.Args[1])
+
+	defer file.Close()
+
+	if err != nil {
+		log.Println(err)
+		panic(err)
+
+	}
+
+	domains, err := customerimporter.SortDomains(file)
 	if err != nil {
 		log.Println(err)
 	}
 
 	for _, d := range domains {
-		fmt.Printf("Domain: %s, Occurence: %d \n", d.Domain, d.Count)
+		fmt.Printf("Domain: %s, Occurrence: %d \n", d.Domain, d.Count)
 
 	}
 
