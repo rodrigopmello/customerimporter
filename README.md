@@ -1,4 +1,4 @@
-# custoemrimporter
+# customerimporter
 
 customerimporter reads from the given csv file and returns a sorted (data structure of your choice) of email domains along with the number of customers with e-mail addresses for each domain.
 
